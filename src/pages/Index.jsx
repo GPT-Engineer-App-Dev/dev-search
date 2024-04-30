@@ -1,14 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Flex, Text, Heading, Tag, VStack, SimpleGrid, Input, Button, Modal, FormControl, FormLabel, Select, useDisclosure, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-
-const developers = [
-  { id: 1, name: 'John Doe', location: 'New York, USA', technologies: ['React', 'Node'] },
-  { id: 2, name: 'Jane Smith', location: 'London, UK', technologies: ['.NET', 'JavaScript'] },
-  { id: 3, name: 'Alice Johnson', location: 'Berlin, Germany', technologies: ['Go', 'React'] }
-];
+import { client } from '../../lib/crud';
 
 const Index = () => {
+  const [developers, setDevelopers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterTech, setFilterTech] = useState('');
   const [newName, setNewName] = useState('');
@@ -16,14 +12,25 @@ const Index = () => {
   const [newTechnologies, setNewTechnologies] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  useEffect(() => {
+    const fetchDevelopers = async () => {
+      const data = await client.getWithPrefix('developer:');
+      if (data) {
+        const fetchedDevelopers = data.map(item => item.value);
+        setDevelopers(fetchedDevelopers);
+      }
+    };
+    fetchDevelopers();
+  }, []);
+
   const filteredDevelopers = developers.filter(dev => {
     return (dev.location.toLowerCase().includes(searchTerm.toLowerCase()) || dev.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
            (filterTech === '' || dev.technologies.includes(filterTech));
   });
 
-  const handleAddDeveloper = () => {
+  const handleAddDeveloper = async () => {
     const newDeveloper = { id: developers.length + 1, name: newName, location: newLocation, technologies: newTechnologies };
-    developers.push(newDeveloper);
+    await client.set(`developer:${newDeveloper.id}`, newDeveloper);
     onClose(); // Close the modal
     setNewName(''); // Reset form state
     setNewLocation('');
