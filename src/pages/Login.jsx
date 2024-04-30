@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../AuthContext';
 import { Box, Button, Input, FormControl, FormLabel, useToast } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,6 +9,7 @@ const Login = () => {
   const [accessToken, setAccessToken] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async () => {
     console.log('Attempting to log in with email:', email);
@@ -28,6 +30,7 @@ const Login = () => {
       setAccessToken(access_token); // Store access token in state
       localStorage.setItem('access_token', access_token);
       console.log('Login successful, redirecting...');
+      login(); // Set authentication status to true
     } else {
       console.log('Login failed:', response.statusText);
       toast({
