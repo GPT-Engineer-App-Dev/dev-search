@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Button, Input, FormControl, FormLabel, useToast } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [accessToken, setAccessToken] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -25,9 +25,9 @@ const Login = () => {
 
     if (response.ok) {
       const { access_token } = await response.json();
-      console.log('Login successful, redirecting...');
+      setAccessToken(access_token); // Store access token in state
       localStorage.setItem('access_token', access_token);
-      navigate('/');
+      console.log('Login successful, redirecting...');
     } else {
       console.log('Login failed:', response.statusText);
       toast({
@@ -39,6 +39,12 @@ const Login = () => {
       });
     }
   };
+
+  useEffect(() => {
+    if (accessToken) {
+      navigate('/');
+    }
+  }, [accessToken, navigate]);
 
   return (
     <Box p={5}>
