@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Box, Button, Input, FormControl, FormLabel, useToast } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import { console } from 'console';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -9,6 +10,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    console.log('Attempting to log in with email:', email);
     const response = await fetch('https://mnwefvnykbgyhbdzpleh.supabase.co/auth/v1/token?grant_type=password', {
       method: 'POST',
       headers: {
@@ -19,11 +21,15 @@ const Login = () => {
       body: JSON.stringify({ email, password })
     });
 
+    console.log('Login response:', response);
+
     if (response.ok) {
       const { access_token } = await response.json();
+      console.log('Login successful, redirecting...');
       localStorage.setItem('access_token', access_token);
       navigate('/');
     } else {
+      console.log('Login failed:', response.statusText);
       toast({
         title: 'Login Failed',
         description: 'Invalid email or password',
