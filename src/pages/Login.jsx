@@ -31,6 +31,7 @@ const Login = () => {
       localStorage.setItem('access_token', access_token);
       console.log('Login successful, redirecting...');
       login(); // Set authentication status to true
+      window.location.href = '/'; // Forcefully redirect to the homepage
     } else {
       console.log('Login failed:', response.statusText);
       toast({
